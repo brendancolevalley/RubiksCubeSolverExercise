@@ -656,28 +656,22 @@ class InteractiveCube(plt.Axes):
                       'G':'F1','H':'F2','I':'F3','J':'R1','K':'R2','L':'R3',
                       'M':'B1','N':'B2','O':'B3','P':'D1','Q':'D2','R':'D3'}
         
-        #print "Solved cube is",make_moves(self.cube.cube_string,solve_moves)
-        #print "Cube is",self.cube.cube_string
-        
         for mychar in solve_moves:
             temp_move=move_convert[mychar]
             face=temp_move[0]
-            if int(temp_move[1])<3: n=int(temp_move[1])
-            else: n=-1
+            qturns=int(temp_move[1])
+            if qturns<3: n=qturns
+            else: n=-1 #3 cw q turns is 1 ccw qturn
             
-            #print "Moves is",mychar,"converted to temp move",temp_move
-            #print "Xube is",make_moves(self.cube.cube_string,mychar),\
-            #      "Moves is",mychar,"n is",n,"converted to temp move",temp_move
-            
-            
-            self.rotate_face(face, n, 0, steps=5) #steps should be 3
+            self.rotate_face(face, n, 0, steps=10*abs(n)) #steps should be 3
         self.cube._move_list = []
 
     def _key_press(self, event):
         """Handler for key press events"""
-        if event.key == 'shift':
-            self._shift = True
-        elif event.key.isdigit():
+        
+        #if event.key == 'shift':
+        #    self._shift = True
+        if event.key.isdigit():
             self._digit_flags[int(event.key)] = 1
         elif event.key == 'right':
             if self._shift:
@@ -700,7 +694,7 @@ class InteractiveCube(plt.Axes):
             self.rotate(Quaternion.from_v_theta(self._ax_UD,
                                                 -5 * self._step_UD))
         elif event.key.upper() in 'LRUDBF':
-            if self._shift:
+            if event.key in 'LRUDBF':   
                 direction = -1
             else:
                 direction = 1
@@ -1203,10 +1197,10 @@ def solve_rubiks_cube(rcube):
     true_location = 'Z'
     start_record_score = score_rcube(record_cube)
         
-    print "Start score is",start_record_score," Time is ",time.asctime()    
+    print "Starting cube is",rcube," score is",start_record_score," at ",time.asctime()    
     cubefilename = 'cube'+str(preload_depth)+'.p'
     if  not os.path.exists(cubefilename):
-        print "No solve dictionary file creating it for depth",preload_depth, "Takes approx 10 mins, starting at", time.asctime()
+        print "No solve dictionary file, creating it for depth",preload_depth, "Takes approx 10 mins, starting at", time.asctime()
         create_cube_dict('Z',  solved_cube, 0, preload_depth,cubes_dict)   
         print  "Created list, starting save at ",time.asctime()
         cubefile = open(cubefilename, 'wb')
@@ -1283,7 +1277,7 @@ def condense_moves(moves):
     # Under90, Under180, Under270 is moves P, Q and R respectively
     
     
-    replace_moves={'AA':'B','BB':'','CC':'B','DD':'E','EE':'','FF':'E',\
+    replace_moves={'AA':'B','BB':'','CC':'B','DD':'E','EE':'','FF':'E','AB':'C','AC':'','BA':'C','BC':'A','CA':'','CB':'A',\
                    'GG':'H','HH':'','II':'H','JJ':'K','KK':'','LL':'K',\
                    'MM':'N','NN':'','OO':'N','PP':'Q','QQ':'','RR':'Q',\
                    'APA':'BP','AQA':'BQ','ARA':'BR','BPB':'P','BQB':'Q',\
